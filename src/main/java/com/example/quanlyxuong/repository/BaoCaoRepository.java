@@ -1,4 +1,9 @@
 package com.example.quanlyxuong.repository;
 
-public interface BaoCaoRepository extends org.springframework.data.jpa.repository.JpaRepository<com.example.quanlyxuong.entity.BaoCao, java.lang.Integer> {
-  }
+import com.example.quanlyxuong.entity.BaoCao;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface BaoCaoRepository extends JpaRepository<BaoCao, Integer> {
+}

@@ -1,4 +1,9 @@
 package com.example.quanlyxuong.repository;
 
-public interface DuAnRepository extends org.springframework.data.jpa.repository.JpaRepository<com.example.quanlyxuong.entity.DuAn, java.lang.Integer> {
-  }
+import com.example.quanlyxuong.entity.DuAn;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DuAnRepository extends JpaRepository<DuAn, Integer> {
+}
