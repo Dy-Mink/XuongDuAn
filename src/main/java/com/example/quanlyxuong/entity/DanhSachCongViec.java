@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "danh_sach_cong_viec")
+@Table(name = "danh_sach_cong_viec", schema = "dbo")
 public class DanhSachCongViec {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,7 +20,7 @@ public class DanhSachCongViec {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_du_an")
-    private com.example.quanlyxuong.entity.DuAn idDuAn;
+    private DuAn idDuAn;
 
     @Size(max = 255)
     @Nationalized

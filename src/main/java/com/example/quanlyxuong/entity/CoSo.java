@@ -1,9 +1,6 @@
 package com.example.quanlyxuong.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +11,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "co_so")
+@Table(name = "co_so", schema = "dbo")
 public class CoSo {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_co_so", nullable = false)
     private Integer id;
 

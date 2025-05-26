@@ -9,7 +9,7 @@ import org.hibernate.annotations.Nationalized;
 @Getter
 @Setter
 @Entity
-@Table(name = "loai_du_an")
+@Table(name = "loai_du_an", schema = "dbo")
 public class LoaiDuAn {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
