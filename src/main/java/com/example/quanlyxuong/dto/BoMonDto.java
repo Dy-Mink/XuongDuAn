@@ -7,7 +7,6 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
@@ -25,5 +24,15 @@ public class BoMonDto {
     private LocalDate ngayThanhLap;
 
     private Boolean trangThai;
+
+    public BoMonDto(Integer id, String maBoMon, String tenBoMon, String trungBoMon, Integer soThanhVien, LocalDate ngayThanhLap, Boolean trangThai) {
+        this.id = id;
+        this.maBoMon = maBoMon;
+        this.tenBoMon = tenBoMon;
+        this.trungBoMon = trungBoMon;
+        this.soThanhVien = soThanhVien;
+        this.ngayThanhLap = ngayThanhLap;
+        this.trangThai = trangThai;
+    }
 
 }
