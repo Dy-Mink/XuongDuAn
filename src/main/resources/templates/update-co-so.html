@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--        Update add co so-->
+<div id="modal-update" class="modal-overlay">
+  <div class="modal-content">
+    <h2>Sửa Cơ Sở</h2>
+    <form action="" method="post" th:object="${coSoDetail}">
+      <label>Mã cơ sở*</label>
+      <input type="text" placeholder="Nhập mã cơ sở" th:field="*{maCoSo}">
+      <i style="color: red" th:errors="*{maCoSo}"></i>
+      <span th:if="${maCoSoError}" th:text="${maCoSoError}" class="text-danger"></span>
+      <br>
+      <label>Tên cơ sở*</label>
+      <input type="text" placeholder="Nhập tên cơ sở" th:field="*{tenCoSo}">
+      <i style="color: red" th:errors="*{tenCoSo}"></i><br>
+      <label>Địa chỉ*</label>
+      <input type="text" placeholder="Nhập địa chỉ" th:field="*{diaChi}">
+      <i style="color: red" th:errors="*{diaChi}"></i><br>
+      <label>SDT*</label>
+      <input type="text" placeholder="Nhập SDT" th:field="*{soDienThoai}" id="soDienThoai">
+      <i style="color: red" th:errors="*{soDienThoai}"></i><br>
+      <label>Email*</label>
+      <input type="text" placeholder="Nhập Email" th:field="*{email}" id="email">
+      <i style="color: red" th:errors="*{email}"></i><br>
+      <label>Ngày thành lập*</label>
+      <input type="datetime-local" placeholder="Nhập ngày thành lập" th:field="*{ngayThanhLap}">
+      <i style="color: red" th:errors="*{ngayThanhLap}"></i><br>
+      <label>Ngày tạo*</label>
+      <input type="datetime-local" placeholder="Nhập ngày tạo" th:field="*{ngayTao}">
+      <i style="color: red" th:errors="*{ngayTao}"></i><br>
+      <label>Ngày Update*</label>
+      <input type="datetime-local" placeholder="Nhập ngày Update" th:field="*{ngayUpdate}">
+      <i style="color: red" th:errors="*{ngayUpdate}"></i><br>
+      <label>Trạng thái*</label>
+      <select th:field="*{trangThai}" id="">
+        <option value="true">Hoạt Động</option>
+        <option value="false">Không hoạt Động</option>
+      </select>
+      <p style="font-size: 12px; color: #999;">(*) Biểu thị trường không được trống!</p>
+      <div class="modal-buttons">
+        <button type="button" onclick="closeModal()">Đóng</button>
+        <button type="submit">Lưu</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

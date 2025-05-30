@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Danh sách cơ sở</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/icofont/1.0.1/css/icofont.min.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+        }
+
+
+        .filter-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+        }
+
+        .filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            background-color: #f8f9fa;
+            font-size: 14px;
+        }
+
+        .filter-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .filter-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .filter-actions .btn-filter {
+            background-color: #5a5266;
+            color: #fff;
+        }
+
+        .filter-actions .btn-clear {
+            background-color: #f1f1f1;
+            color: #000;
+        }
+
+        .filter-group input::placeholder {
+            color: #999;
+        }
+
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .title-box {
+            background-color: #f5f7fa;
+            padding: 20px;
+            border-radius: 0;
+            border: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-box h3 {
+            margin: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-group button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .btn-excel { background-color: #3498db; }
+        .btn-import { background-color: #1abc9c; }
+        .btn-add {
+            display: inline-block;
+            background-color: #28a745; /* xanh lá đậm */
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .btn-add:active {
+            transform: scale(0.98);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .pagination button {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 4px;
+        }
+
+        .date-info {
+            font-size: 12px;
+            color: gray;
+            margin-top: 5px;
+        }
+        .tenCoSo{
+            width: 400px;
+        }
+        .trangThai{
+            width: 400px;
+        }
+        .img-icon a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: #333;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .iconNote{
+            height: 30px;
+            width: 30px;
+        }
+
+        /*form css*/
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            overflow-y: auto; /* ✅ THÊM DÒNG NÀY */
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            width: 400px;
+            max-height: 90vh; /* ✅ THÊM DÒNG NÀY */
+            overflow-y: auto;  /* ✅ THÊM DÒNG NÀY */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .modal-buttons button:first-child {
+            background-color: #ddd;
+        }
+
+        .modal-buttons button:last-child {
+            background-color: #1a73e8;
+            color: white;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+
+    </style>
+</head>
+<body>
+
+<!-- Bộ lọc -->
+<form action="/search" method="get" class="filter-container">
+    <div class="filter-row">
+        <div class="filter-group">
+            <label for="tenCoSo">Từ khoá:</label>
+            <input type="text" id="tenCoSo" name="tenCoSo" placeholder="🔍 Tìm theo tên cơ sở">
+        </div>
+        <div class="filter-group">
+            <label for="trangThai">Trạng thái:</label>
+            <select id="trangThai" name="trangThai">
+                <option value="">-- Tất cả trạng thái --</option>
+                <option value="true">Đang hoạt động</option>
+                <option value="false">Ngừng hoạt động</option>
+            </select>
+        </div>
+    </div>
+    <div class="filter-actions">
+        <button type="submit" class="btn-filter"><i class="fa-solid fa-filter"></i>Lọc</button>
+        <a href="/hien-thi-co-so" class="btn-clear" style="padding: 8px 16px; border-radius: 6px; border: none; display: inline-block; background-color: #f1f1f1; color: #000; text-decoration: none;">Hủy lọc</a>
+<!--        <button><a href="/hien-thi-co-so" class="btn-clear">Hủy lọc</a></button>-->
+    </div>
+</form>
+
+
+<!-- Tiêu đề danh sách -->
+<div class="title-box">
+    <div>
+        <h3>📋 Danh sách cơ sở</h3>
+        <div class="date-info">
+            Ngày tạo: 01/01/2025<br>
+            Ngày update: 01/01/2025
+        </div>
+    </div>
+    <div class="btn-group">
+        <button class="btn-excel">Xuất excel</button>
+        <input type="file" id="excelFile" name="file" accept=".xlsx,.xls" style="display: none;" />
+        <button class="btn-import" onclick="handleImport()">Import Template</button>
+        <a href="/openAddCoSo" class="btn-add" id="add-co-so">➕ Thêm cơ sở</a>
+
+<!--        <button class="btn-add" id="add-co-so">➕ Thêm cơ sở</button>-->
+    </div>
+<!--        from add co so-->
+        <div id="modal" class="modal-overlay">
+            <div class="modal-content">
+                <h2>Thêm Cơ Sở</h2>
+                <form action="/addCoSo" id="formThemCoSo" method="post" th:object="${coSo}">
+                    <label>Mã cơ sở*</label>
+                    <input type="text" placeholder="Nhập mã cơ sở" th:field="*{maCoSo}">
+                    <i style="color: red" th:errors="*{maCoSo}"></i>
+                    <span th:if="${maCoSoError}" th:text="${maCoSoError}" class="text-danger"></span>
+                    <br>
+                    <label>Tên cơ sở*</label>
+                    <input type="text" placeholder="Nhập tên cơ sở" th:field="*{tenCoSo}">
+                    <i style="color: red" th:errors="*{tenCoSo}"></i><br>
+                    <label>Địa chỉ*</label>
+                    <input type="text" placeholder="Nhập địa chỉ" th:field="*{diaChi}">
+                    <i style="color: red" th:errors="*{diaChi}"></i><br>
+                    <label>SDT*</label>
+                    <input type="text" placeholder="Nhập SDT" th:field="*{soDienThoai}" id="soDienThoai">
+                    <i style="color: red" th:errors="*{soDienThoai}"></i><br>
+                    <label>Email*</label>
+                    <input type="text" placeholder="Nhập Email" th:field="*{email}" id="email">
+                    <i style="color: red" th:errors="*{email}"></i><br>
+                    <label>Ngày thành lập*</label>
+                    <input type="date" placeholder="Nhập ngày thành lập" th:field="*{ngayThanhLap}">
+                    <i style="color: red" th:errors="*{ngayThanhLap}"></i><br>
+                    <label>Ngày tạo*</label>
+                    <input type="date" placeholder="Nhập ngày tạo" th:field="*{ngayTao}">
+                    <i style="color: red" th:errors="*{ngayTao}"></i><br>
+                    <label>Ngày Update*</label>
+                    <input type="date" placeholder="Nhập ngày Update" th:field="*{ngayUpdate}">
+                    <i style="color: red" th:errors="*{ngayUpdate}"></i><br>
+                    <label>Trạng thái*</label>
+                    <select th:field="*{trangThai}" >
+                        <option value="true">Hoạt Động</option>
+                        <option value="false">Không hoạt Động</option>
+                    </select>
+                    <p style="font-size: 12px; color: #999;">(*) Biểu thị trường không được trống!</p>
+                    <div class="modal-buttons">
+                        <button type="button" onclick="closeModal()">Đóng</button>
+                        <button type="submit">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+</div>
+<!--        Update co so-->
+<div id="modal-update" class="modal-overlay">
+    <div class="modal-content">
+        <h2>Sửa Cơ Sở</h2>
+        <form th:action="@{'/updateCoSo/' + ${coSo.id}}" id="formUpdate" method="post" th:object="${coSo}">
+            <label>Mã cơ sở*</label>
+            <input type="text" placeholder="Nhập mã cơ sở" th:field="*{maCoSo}" required>
+            <i style="color: red" th:errors="*{maCoSo}"></i>
+            <span th:if="${maCoSoError}" th:text="${maCoSoError}" class="text-danger"></span>
+            <br>
+            <label>Tên cơ sở*</label>
+            <input type="text" placeholder="Nhập tên cơ sở" th:field="*{tenCoSo}">
+            <i style="color: red" th:errors="*{tenCoSo}"></i><br>
+            <label>Địa chỉ*</label>
+            <input type="text" placeholder="Nhập địa chỉ" th:field="*{diaChi}">
+            <i style="color: red" th:errors="*{diaChi}"></i><br>
+            <label>SDT*</label>
+            <input type="text" placeholder="Nhập SDT" th:field="*{soDienThoai}" id="soDienThoai">
+            <i style="color: red" th:errors="*{soDienThoai}"></i><br>
+            <label>Email*</label>
+            <input type="text" placeholder="Nhập Email" th:field="*{email}" id="email">
+            <i style="color: red" th:errors="*{email}"></i><br>
+            <label>Ngày thành lập*</label>
+            <input type="date" placeholder="Nhập ngày thành lập" th:field="*{ngayThanhLap}">
+            <i style="color: red" th:errors="*{ngayThanhLap}"></i><br>
+            <label>Ngày tạo*</label>
+            <input type="date" placeholder="Nhập ngày tạo" th:field="*{ngayTao}">
+            <i style="color: red" th:errors="*{ngayTao}"></i><br>
+            <label>Ngày Update*</label>
+            <input type="date" placeholder="Nhập ngày Update" th:field="*{ngayUpdate}">
+            <i style="color: red" th:errors="*{ngayUpdate}"></i><br>
+            <label>Trạng thái*</label>
+            <select th:field="*{trangThai}" >
+                <option value="true">Hoạt Động</option>
+                <option value="false">Không hoạt Động</option>
+            </select>
+            <p style="font-size: 12px; color: #999;">(*) Biểu thị trường không được trống!</p>
+            <div class="modal-buttons">
+                <button type="button" onclick="closeModal()">Đóng</button>
+                <button type="submit">Cập nhật</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Bảng -->
+<table>
+    <thead>
+    <tr>
+        <th>STT</th>
+        <th>Mã cơ sở</th>
+        <th>Tên cơ sở</th>
+        <th>Địa chỉ</th>
+        <th>SDT</th>
+        <th>Email</th>
+        <th>Ngày thành lập</th>
+        <th>Ngày tạo</th>
+        <th>Ngày Update</th>
+        <th>Trạng thái</th>
+        <th>Hoạt động</th>
+    </tr>
+    </thead>
+    <tbody th:each="u:${listCoSo}">
+    <tr>
+        <th th:text="${u.id}">STT</th>
+        <th th:text="${u.maCoSo}">Mã cơ sở</th>
+        <th th:text="${u.tenCoSo}">Tên cơ sở</th>
+        <th th:text="${u.diaChi}">Địa chỉ</th>
+        <th th:text="${u.soDienThoai}">SDT</th>
+        <th th:text="${u.email}">Email</th>
+        <th th:text="${u.ngayThanhLap}">Ngày thành lập</th>
+        <th th:text="${u.ngayTao}">Ngày tạo</th>
+        <th th:text="${u.ngayUpdate}">Ngày Update</th>
+        <th th:text="${u.trangThai ? 'Đang hoạt động':'Ngừng hoạt động'}">Trạng thái</th>
+        <th >
+            <a th:href="@{|/delete/*{u.id}|}"><i class="fas fa-trash fa-lg" style="color: red; cursor: pointer;"></i></a>
+            <a th:href="@{|/detail/*{u.id}|}"><i id="update-co-so" class="iconNote">📋</i>
+            </a>
+            <a th:href="@{|/status/*{u.id}|}">🔁</a>
+        </th>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Phân trang -->
+<!--<div class="pagination">-->
+<!--    <div>-->
+<!--        <ul>-->
+<!--            <li th:if="${currentPage > 0}">-->
+<!--                <a th:href="@{/hien-thi-co-so(pageNo=${currentPage - 1})}">Previous</a>-->
+<!--            </li>-->
+<!--            <li th:each="i : ${#numbers.sequence(0, totalPages - 1)}">-->
+<!--                <a th:href="@{/hien-thi-co-so(pageNo=${i})}"-->
+<!--                   th:text="${i + 1}"-->
+<!--                   th:classappend="${i == currentPage} ? 'active' : ''"></a>-->
+<!--            </li>-->
+<!--            <li th:if="${currentPage < totalPages - 1}">-->
+<!--                <a th:href="@{/hien-thi-co-so(pageNo=${currentPage + 1})}">Next</a>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </div>-->
+<!--</div>-->
+
+
+<div class="pagination">
+    <button>Trang đầu</button>
+    <button>Trang trước</button>
+    <button disabled>1</button>
+    <button>Trang sau</button>
+    <button>Trang cuối</button>
+</div>
+<script th:inline="javascript">
+    function closeModal() {
+        document.getElementById("modal").style.display = "none";
+        document.getElementById("modal-update").style.display = "none";
+    }
+
+    let openModal = [[${openAddModal}]];
+    if (openModal) {
+        document.getElementById("modal").style.display = "flex";
+    }
+    let openUpdateModal = [[${openUpdateModal}]];
+    if (openUpdateModal) {
+        document.getElementById("modal-update").style.display = "flex";
+    }
+
+    // Nếu muốn đóng modal khi click ra ngoài khung modal
+    window.onclick = function (event) {
+        const modal = document.getElementById("modal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+
+        const modalUpdate = document.getElementById("modal-update");
+        if (event.target === modalUpdate) {
+            modalUpdate.style.display = "none";
+        }
+    }
+
+    document.getElementById('formThemCoSo').addEventListener('submit', function (e) {
+        const sdt = document.getElementById('soDienThoai').value;
+        const email = document.getElementById('email').value;
+        const sdtRegex = /^(0\d{9})$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!sdtRegex.test(sdt)) {
+            alert("Số điện thoại không hợp lệ");
+            e.preventDefault();
+        }
+        if (!emailRegex.test(email)) {
+            alert("Email không hợp lệ");
+            e.preventDefault();
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector(".btn-excel").addEventListener("click", function () {
+            // Tạo 1 thẻ a ẩn để tải file
+            const link = document.createElement("a");
+            link.href = "/export-excel"; // URL mapping tới API backend Spring Boot
+            link.download = "CoSo.xlsx"; // Tên file khi tải về
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    });
+
+    function handleImport() {
+        // Kích hoạt input file khi click
+        document.getElementById('excelFile').click();
+    }
+
+    document.getElementById('excelFile').addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        fetch('/co-so/import', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url; // nếu có redirect
+                } else {
+                    return response.text();
+                }
+            })
+            .then(data => {
+                alert("Import thành công!");
+                location.reload(); // hoặc gọi lại load danh sách nếu có AJAX
+            })
+            .catch(error => {
+                console.error("Lỗi import:", error);
+                alert("Lỗi khi import file Excel.");
+            });
+    });
+</script>
+</body>
+</html>
