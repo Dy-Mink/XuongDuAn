@@ -2,6 +2,7 @@ package com.example.quanlyxuong.service;
 
 import com.example.quanlyxuong.dto.BoMonDto;
 import com.example.quanlyxuong.entity.BoMon;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ import java.util.List;
 public interface BoMonService {
     List<BoMonDto> getBoMon();
 
-    BoMon  addBoMon(BoMon boMon);
+    BoMon addBoMon(BoMon boMon);
 
     BoMon getBoMonCanTim(Integer id);
 
@@ -23,7 +24,9 @@ public interface BoMonService {
 
     Page<BoMon> getBoMonPage(int page, int size);
 
-//    void exportToExcel(MultipartFile file);
-//
-//    void importExcel(MultipartFile file) throws Exception;
+    void exportToExcel(HttpServletResponse response) throws IOException;
+
+    void saveAll(List<BoMon> boMons);
+
+    List<String> importFromExcel(MultipartFile file) throws Exception;
 }

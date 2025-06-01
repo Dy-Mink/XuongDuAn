@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.quanlyxuong.excel.ExcelExporter;
 import org.springframework.http.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -30,37 +31,40 @@ public class HomeController {
 
     private final BoMonService boMonService;
 
-//    @GetMapping("/export")
-//    public void exportToExcel(HttpServletResponse response) {
-//        try {
-//            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//            String fileName = "Danh_sach_bo_mon.xlsx";
-//            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-//            boMonService.exportToExcel(response);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            // Có thể ghi log hoặc trả response lỗi nếu cần
-//        }
-//    }
-//
-//
-//
-//    @GetMapping("/import")
-//    public String showImportPage() {
-//        return "/Admin/quanLyBoMon";
-//    }
-//
-//    @PostMapping("/import")
-//    public String importExcel(@RequestParam("file") MultipartFile file, Model model) {
-//        try {
-//            boMonService.importExcel(file);
-//            model.addAttribute("message", "Import thành công!");
-//        } catch (Exception e) {
-//            model.addAttribute("message", "Lỗi khi import: " + e.getMessage());
-//            e.printStackTrace();
-//        }
-//        return "/Admin/quanLyBoMon";
-//    }
+    @GetMapping("/export")
+    public void exportToExcel(HttpServletResponse response) {
+        try {
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            String fileName = "Danh_sach_bo_mon.xlsx";
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            boMonService.exportToExcel(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/import")
+    public String importBoMon(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
+        if (file.isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Vui lòng chọn file Excel để import!");
+            return "redirect:/admin/boMon";
+        }
+
+        try {
+            List<String> errors = boMonService.importFromExcel(file);
+            if (!errors.isEmpty()) {
+                String errorMessage = String.join("<br>", errors);
+                redirectAttributes.addFlashAttribute("errorMessage", errorMessage);
+            } else {
+                redirectAttributes.addFlashAttribute("message", "Import thành công!");
+            }
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Import lỗi: " + e.getMessage());
+        }
+
+        return "redirect:/admin/boMon";
+    }
+
 
     @GetMapping("/hien-thi")
     public String getBoMon(Model model) {

@@ -28,6 +28,4 @@ public interface BoMonRepository extends JpaRepository<BoMon, Integer> {
 
     Optional<BoMon> findByMaBoMon(String maBoMon);
 
-
-
 }

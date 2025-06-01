@@ -13,7 +13,7 @@ function openPopup(title, data = null) {
     document.getElementById("popupTrangThai").value = data?.trangThai ? "true" : "false";
 
     document.getElementById("popup").style.display = "block";
-    document.getElementById("overlay").style.display = "block"; // hiện overlay
+    document.getElementById("overlay").style.display = "block";
 }
 
 function closePopup() {
@@ -24,7 +24,6 @@ function closePopup() {
 }
 
 function submitForm() {
-    // Xóa lỗi cũ
     document.querySelectorAll('.error-message').forEach(el => el.innerText = "");
 
     let isValid = true;
@@ -121,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('tenBoMon');
     const tableBody = document.getElementById('boMonTableBody');
 
-    if (!searchInput || !tableBody) return; // tránh lỗi nếu chưa có phần tử
+    if (!searchInput || !tableBody) return;
 
     let debounceTimeout;
     searchInput.addEventListener('input', function () {
@@ -131,7 +130,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const keyword = searchInput.value.trim();
 
             if (!keyword) {
-                // Nếu bỏ trống tìm kiếm thì reload về danh sách mặc định
                 window.location.href = '/admin/boMon';
                 return;
             }
@@ -180,9 +178,8 @@ filterTrangThai.addEventListener('change', () => {
     const selectedValue = filterTrangThai.value;
 
     tableRows.forEach(row => {
-        const trangThaiCell = row.cells[6].innerText.trim(); // cột trạng thái (cột 7, index 6)
+        const trangThaiCell = row.cells[6].innerText.trim();
         if (selectedValue === "") {
-            // Hiện tất cả khi chưa chọn
             row.style.display = '';
         } else if ((selectedValue === "true" && trangThaiCell === "Hoạt động") ||
             (selectedValue === "false" && trangThaiCell === "Ngừng hoạt động")) {
@@ -193,16 +190,6 @@ filterTrangThai.addEventListener('change', () => {
     });
 });
 // ------------------------------------------------------------------------------
-const importBtn = document.getElementById('importBtn');
-const fileInput = document.getElementById('fileInput');
-const form = document.getElementById('importForm');
-
-importBtn.addEventListener('click', () => {
-    fileInput.click();  // Mở hộp thoại chọn file
-});
-
-fileInput.addEventListener('change', () => {
-    if (fileInput.files.length > 0) {
-        form.submit();   // Tự động submit form khi đã chọn file
-    }
-});
+function triggerFileInput() {
+    document.getElementById('fileInput').click();
+}

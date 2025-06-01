@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -110,123 +112,155 @@ public class BoMonServiceImpl  implements BoMonService {
         return boMonRepository.findAll(pageable);
     }
 
-//    @Override
-//    public void exportToExcel(HttpServletResponse response) throws IOException {
-//        List<BoMon> listBoMon = boMonRepository.findAll();
-//
-//        try (XSSFWorkbook workbook = new XSSFWorkbook();
-//             ServletOutputStream outputStream = response.getOutputStream()) {
-//
-//            Sheet sheet = workbook.createSheet("Bộ Môn");
-//            Row headerRow = sheet.createRow(0);
-//            String[] columns = {"Mã bộ môn", "Tên bộ môn", "Trưởng bộ môn", "Số thành viên", "Ngày thành lập", "Trạng thái"};
-//
-//            for (int i = 0; i < columns.length; i++) {
-//                Cell cell = headerRow.createCell(i);
-//                cell.setCellValue(columns[i]);
-//            }
-//
-//            int rowIdx = 1;
-//            for (BoMon bm : listBoMon) {
-//                Row row = sheet.createRow(rowIdx++);
-//                row.createCell(0).setCellValue(bm.getMaBoMon());
-//                row.createCell(1).setCellValue(bm.getTenBoMon());
-//                row.createCell(2).setCellValue(bm.getTrungBoMon());
-//                row.createCell(3).setCellValue(bm.getSoThanhVien());
-//
-//                if (bm.getNgayThanhLap() != null) {
-//                    CreationHelper createHelper = workbook.getCreationHelper();
-//                    CellStyle cellStyle = workbook.createCellStyle();
-//                    cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
-//                    Cell dateCell = row.createCell(4);
-//                    dateCell.setCellValue(bm.getNgayThanhLap());
-//                    dateCell.setCellStyle(cellStyle);
-//                } else {
-//                    row.createCell(4).setCellValue("");
-//                }
-//
-//                row.createCell(5).setCellValue(bm.getTrangThai() ? "Hoạt động" : "Ngừng hoạt động");
-//            }
-//
-//            for (int i = 0; i < columns.length; i++) {
-//                sheet.autoSizeColumn(i);
-//            }
-//
-//            workbook.write(outputStream);
-//            outputStream.flush();
-//        }
-//    }
-//
-//    @Override
-//    public void importExcel(MultipartFile file) throws Exception {
-//        try (InputStream is = file.getInputStream()) {
-//            Workbook workbook = new XSSFWorkbook(is);
-//            Sheet sheet = workbook.getSheetAt(0);
-//            Iterator<Row> rows = sheet.iterator();
-//
-//            boolean firstRow = true;
-//            while (rows.hasNext()) {
-//                Row currentRow = rows.next();
-//                if (firstRow) {
-//                    firstRow = false; // skip header row
-//                    continue;
-//                }
-//
-//                Cell maBoMonCell = currentRow.getCell(0);
-//                if (maBoMonCell == null || maBoMonCell.getCellType() == CellType.BLANK ||
-//                        maBoMonCell.getStringCellValue().trim().isEmpty()) {
-//                    continue; // skip empty code rows
-//                }
-//
-//                String maBoMon = maBoMonCell.getStringCellValue().trim();
-//
-//                if (boMonRepository.findByMaBoMon(maBoMon).isPresent()) {
-//                    continue; // skip duplicates
-//                }
-//
-//                BoMon boMon = new BoMon();
-//                boMon.setMaBoMon(maBoMon);
-//
-//                Cell tenBoMonCell = currentRow.getCell(1);
-//                boMon.setTenBoMon(tenBoMonCell != null && tenBoMonCell.getCellType() != CellType.BLANK
-//                        ? tenBoMonCell.getStringCellValue() : "");
-//
-//                Cell trungBoMonCell = currentRow.getCell(2);
-//                boMon.setTrungBoMon(trungBoMonCell != null && trungBoMonCell.getCellType() != CellType.BLANK
-//                        ? trungBoMonCell.getStringCellValue() : "");
-//
-//                Cell soThanhVienCell = currentRow.getCell(3);
-//                boMon.setSoThanhVien(soThanhVienCell != null && soThanhVienCell.getCellType() == CellType.NUMERIC
-//                        ? (int) soThanhVienCell.getNumericCellValue() : 0);
-//
-//                Cell ngayThanhLapCell = currentRow.getCell(4);
-//                if (ngayThanhLapCell != null && ngayThanhLapCell.getCellType() == CellType.NUMERIC) {
-//                    LocalDate date = ngayThanhLapCell.getDateCellValue().toInstant()
-//                            .atZone(ZoneId.systemDefault()).toLocalDate();
-//                    boMon.setNgayThanhLap(date);
-//                } else {
-//                    boMon.setNgayThanhLap(null);
-//                }
-//
-//                Cell trangThaiCell = currentRow.getCell(5);
-//                if (trangThaiCell != null) {
-//                    if (trangThaiCell.getCellType() == CellType.BOOLEAN) {
-//                        boMon.setTrangThai(trangThaiCell.getBooleanCellValue());
-//                    } else if (trangThaiCell.getCellType() == CellType.NUMERIC) {
-//                        boMon.setTrangThai(trangThaiCell.getNumericCellValue() == 1);
-//                    } else if (trangThaiCell.getCellType() == CellType.STRING) {
-//                        boMon.setTrangThai(trangThaiCell.getStringCellValue().equalsIgnoreCase("true"));
-//                    } else {
-//                        boMon.setTrangThai(false);
-//                    }
-//                } else {
-//                    boMon.setTrangThai(false);
-//                }
-//
-//                boMonRepository.save(boMon);
-//            }
-//            workbook.close();
-//        }
-//    }
+    @Override
+    public void exportToExcel(HttpServletResponse response) throws IOException {
+        List<BoMon> listBoMon = boMonRepository.findAll();
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook();
+             ServletOutputStream outputStream = response.getOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Bộ Môn");
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"Mã bộ môn", "Tên bộ môn", "Trưởng bộ môn", "Số thành viên", "Ngày thành lập", "Trạng thái"};
+
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+            }
+
+            int rowIdx = 1;
+            for (BoMon bm : listBoMon) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(bm.getMaBoMon());
+                row.createCell(1).setCellValue(bm.getTenBoMon());
+                row.createCell(2).setCellValue(bm.getTrungBoMon());
+                row.createCell(3).setCellValue(bm.getSoThanhVien());
+
+                if (bm.getNgayThanhLap() != null) {
+                    CreationHelper createHelper = workbook.getCreationHelper();
+                    CellStyle cellStyle = workbook.createCellStyle();
+                    cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("dd/MM/yyyy"));
+                    Cell dateCell = row.createCell(4);
+                    dateCell.setCellValue(bm.getNgayThanhLap());
+                    dateCell.setCellStyle(cellStyle);
+                } else {
+                    row.createCell(4).setCellValue("");
+                }
+
+                row.createCell(5).setCellValue(bm.getTrangThai() ? "Hoạt động" : "Ngừng hoạt động");
+            }
+
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(outputStream);
+            outputStream.flush();
+        }
+    }
+
+    @Override
+    public void saveAll(List<BoMon> boMons) {
+        boMonRepository.saveAll(boMons);
+    }
+
+    @Override
+    public List<String> importFromExcel(MultipartFile file) throws IOException {
+        List<String> errors = new ArrayList<>();
+        List<BoMon> boMons = new ArrayList<>();
+
+        List<String> maBoMonHienCo = boMonRepository.findAll()
+                .stream()
+                .map(BoMon::getMaBoMon)
+                .toList();
+
+        try (InputStream is = file.getInputStream()) {
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheetAt(0);
+            Iterator<Row> rows = sheet.iterator();
+
+            if (rows.hasNext()) rows.next(); // Bỏ header
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            int rowNumber = 1;
+
+            while (rows.hasNext()) {
+                rowNumber++;
+                Row currentRow = rows.next();
+
+                String maBoMon = getCellValue(currentRow.getCell(0));
+                String tenBoMon = getCellValue(currentRow.getCell(1));
+
+                if (maBoMon.isEmpty()) {
+                    errors.add(" Mã bộ môn không được để trống!");
+                    continue;
+                }
+                if (tenBoMon.isEmpty()) {
+                    errors.add(" Tên bộ môn không được để trống!");
+                    continue;
+                }
+
+                if (boMons.stream().anyMatch(bm -> bm.getMaBoMon().equals(maBoMon))) {
+                    errors.add(" Mã bộ môn '" + maBoMon + "' bị trùng trong file import!");
+                    continue;
+                }
+
+                // Check trùng với DB
+                if (maBoMonHienCo.contains(maBoMon)) {
+                    errors.add(" Mã bộ môn '" + maBoMon + "' đã tồn tại trong hệ thống!");
+                    continue;
+                }
+
+                BoMon boMon = new BoMon();
+                boMon.setMaBoMon(maBoMon);
+                boMon.setTenBoMon(tenBoMon);
+                boMon.setTrungBoMon(getCellValue(currentRow.getCell(2)));
+
+                String soThanhVienStr = getCellValue(currentRow.getCell(3));
+                boMon.setSoThanhVien(soThanhVienStr.isEmpty() ? 0 : Integer.parseInt(soThanhVienStr));
+
+                String ngayThanhLapStr = getCellValue(currentRow.getCell(4));
+                if (!ngayThanhLapStr.isEmpty()) {
+                    boMon.setNgayThanhLap(LocalDate.parse(ngayThanhLapStr, formatter));
+                }
+
+                String trangThaiStr = getCellValue(currentRow.getCell(5));
+                boMon.setTrangThai("true".equalsIgnoreCase(trangThaiStr));
+
+                boMons.add(boMon);
+            }
+            workbook.close();
+        } catch (IOException e) {
+            errors.add("Lỗi đọc file Excel: " + e.getMessage());
+        }
+
+        if (errors.isEmpty()) {
+            boMonRepository.saveAll(boMons);
+        }
+
+        return errors;
+    }
+
+
+    private String getCellValue(Cell cell) {
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue().trim();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getLocalDateTimeCellValue().toLocalDate().toString();
+                } else {
+                    return String.valueOf((int) cell.getNumericCellValue());
+                }
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            case BLANK:
+            default:
+                return "";
+        }
+    }
 
 }
