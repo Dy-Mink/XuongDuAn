@@ -1,9 +1,6 @@
 package com.example.quanlyxuong.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +11,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "du_an")
+@Table(name = "du_an", schema = "dbo")
 public class DuAn {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_du_an", nullable = false)
     private Integer id;
 
@@ -31,6 +29,22 @@ public class DuAn {
 
     @Column(name = "ngay_update")
     private LocalDate ngayUpdate;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_bo_mon")
+    private BoMon idBoMon;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_co_so")
+    private CoSo idCoSo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_chuyen_nganh")
+    private ChuyenNganh idChuyenNganh;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_loai_du_an")
+    private LoaiDuAn idLoaiDuAn;
 
     @Column(name = "ngay_bat_dau")
     private LocalDate ngayBatDau;

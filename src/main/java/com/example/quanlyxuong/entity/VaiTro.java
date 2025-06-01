@@ -1,9 +1,6 @@
 package com.example.quanlyxuong.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,9 +9,10 @@ import org.hibernate.annotations.Nationalized;
 @Getter
 @Setter
 @Entity
-@Table(name = "vai_tro")
+@Table(name = "vai_tro", schema = "dbo")
 public class VaiTro {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_vai_tro", nullable = false)
     private Integer id;
 
@@ -26,6 +24,10 @@ public class VaiTro {
     @Nationalized
     @Column(name = "ten_vai_tro", length = 100)
     private String tenVaiTro;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_co_so")
+    private CoSo idCoSo;
 
     @Size(max = 255)
     @Nationalized

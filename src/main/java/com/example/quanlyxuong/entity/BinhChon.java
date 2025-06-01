@@ -11,18 +11,20 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "binh_chon")
+@Table(name = "binh_chon", schema = "dbo")
 public class BinhChon {
+    @EmbeddedId
+    private BinhChonId id;
 
-    @Id
+    @MapsId("idCongViec")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cong_viec", nullable = false)
-    private com.example.quanlyxuong.entity.CongViec idCongViec;
+    private CongViec idCongViec;
 
-    @Id
+    @MapsId("idNguoiDung")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_nguoi_dung", nullable = false)
-    private com.example.quanlyxuong.entity.NguoiDung idNguoiDung;
+    private NguoiDung idNguoiDung;
 
     @Size(max = 255)
     @Nationalized

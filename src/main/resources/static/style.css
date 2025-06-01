@@ -1,0 +1,249 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+.container-fluid {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+img {
+    height: 80px;
+    width: 200px;
+}
+
+.icon-btn {
+    background-color: #e9ecef;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-text {
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.header {
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 20px !important;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+    padding: 20px;
+    height: 100vh;
+    overflow-y: auto;
+}
+.sidebar h2 {
+    margin-top: 0;
+}
+.menu {
+    list-style: none;
+    padding: 0;
+}
+.menu li {
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.menu li.active, .menu li:hover {
+    background-color: #dedcff;
+    font-weight: bold;
+}
+.content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    height: 100vh;
+}
+.filter {
+    background: #f6f6fb;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-header {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #333;
+}
+
+.filter-header i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+.filter-fields {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background: white;
+}
+
+.nav-ds {
+    display: flex;
+    justify-content: space-between;
+}
+
+.table-section {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+}
+.actions {
+    margin-bottom: 10px;
+}
+.actions button {
+    padding: 8px 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 6px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.pagination {
+    margin-top: 10px;
+}
+
+#popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    z-index: 999;
+    width: 600px;
+    max-width: 90%;
+    min-height: 450px;
+    overflow-y: auto;
+}
+
+#popup h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#popup .form-group {
+    margin-bottom: 15px;
+}
+
+#popup .form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+}
+
+#popup .form-group input,
+#popup .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    background: white;
+    font-size: 14px;
+}
+
+#popup > div:last-child {
+    margin-top: 25px;
+    text-align: right;
+}
+
+#popup button {
+    padding: 10px 18px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+#popup button:first-child {
+    background-color: #007bff;
+    color: white;
+}
+
+#popup button:last-child {
+    background-color: #ccc;
+    color: #333;
+}
+#overlay {
+    display: none; /* Mặc định ẩn */
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 998; /* thấp hơn popup */
+}
+#popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 999; /* cao hơn overlay */
+    /* các style popup hiện tại */
+}
+.error-message {
+    color: red;
+    font-size: 0.85em;
+    margin-top: 4px;
+}
