@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -24,5 +25,9 @@ public interface BoMonRepository extends JpaRepository<BoMon, Integer> {
             "CAST(ngay_thanh_lap AS VARCHAR) LIKE %:keyword% OR " +
             "CAST(ma_bo_mon AS VARCHAR) LIKE %:keyword%", nativeQuery = true)
     List<BoMon> searchAllFields(@Param("keyword") String keyword);
+
+    Optional<BoMon> findByMaBoMon(String maBoMon);
+
+
 
 }
