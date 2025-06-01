@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Quản lý Thể loại</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          xintegrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Custom styles to match the image */
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            font-family: 'Inter', sans-serif; /* Using Inter font */
+        }
+
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow for cards */
+            margin-bottom: 1.5rem; /* Space between cards */
+            border-radius: 0.5rem; /* Rounded corners for cards */
+        }
+
+        .card-header {
+            background-color: #e9ecef; /* Light gray for header */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.125); /* Border at the bottom of header */
+            font-weight: bold; /* Bold header text */
+            padding: 0.75rem 1.25rem; /* Padding inside header */
+            color: #343a40; /* Dark text color */
+            border-top-left-radius: 0.5rem; /* Rounded top corners */
+            border-top-right-radius: 0.5rem;
+        }
+
+        .btn {
+            border-radius: 0.3rem; /* Slightly rounded buttons */
+        }
+
+        .btn-primary {
+            background-color: #007bff; /* Primary blue for buttons */
+            border-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: #28a745; /* Success green for buttons */
+            border-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+
+        .btn-warning {
+            background-color: #ffc107; /* Warning yellow for buttons */
+            border-color: #ffc107;
+            color: #212529; /* Dark text for contrast on yellow */
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            border-color: #e0a800;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d; /* Secondary gray for buttons */
+            border-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .form-control {
+            border-radius: 0.3rem; /* Rounded corners for form inputs */
+        }
+
+        .form-control::placeholder {
+            color: #6c757d; /* Lighter placeholder text */
+        }
+
+        .table {
+            border-radius: 0.5rem; /* Rounded corners for table */
+            overflow: hidden; /* Ensures rounded corners are visible */
+        }
+
+        .table thead th {
+            background-color: #e9ecef; /* Light gray for table header */
+            color: #343a40; /* Dark text color */
+            font-weight: bold;
+        }
+
+        .pagination .page-item .page-link {
+            border-radius: 0.3rem; /* Rounded corners for pagination links */
+            margin: 0 0.2rem; /* Small margin between page links */
+        }
+
+        /* Adjustments for the filter section layout */
+        .filter-form .form-group {
+            margin-bottom: 0; /* Remove default bottom margin from form-group */
+        }
+
+        /* Custom style for the select arrow, if needed to match image */
+        .custom-select-wrapper {
+            position: relative;
+        }
+
+        .custom-select-wrapper::after {
+            content: "\f078"; /* Font Awesome chevron-down icon */
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none; /* Allow clicks to pass through */
+            color: #6c757d;
+        }
+        .toast-container {
+            position: fixed;
+            top: 20px; /* Vị trí từ trên xuống */
+            right: 20px; /* Vị trí từ phải sang */
+            z-index: 1050; /* Đảm bảo nó nổi lên trên các phần tử khác */
+            display: flex; /* Dùng flexbox để xếp chồng các toast */
+            flex-direction: column; /* Xếp chồng theo chiều dọc */
+            align-items: flex-end; /* Căn chỉnh các toast sang phải */
+        }
+
+        .toast-notification {
+            background-color: #333; /* Nền tối mặc định */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0; /* Ẩn ban đầu */
+            transform: translateY(-20px); /* Bắt đầu từ hơi cao hơn */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Hiệu ứng mờ dần và trượt */
+            margin-bottom: 10px; /* Khoảng cách giữa các toast nếu có nhiều */
+            min-width: 250px;
+            max-width: 350px;
+            visibility: hidden; /* Ẩn hoàn toàn khi không hiển thị */
+        }
+
+        .toast-notification.show {
+            opacity: 1; /* Hiển thị */
+            transform: translateY(0); /* Trượt về vị trí ban đầu */
+            visibility: visible; /* Hiển thị hoàn toàn */
+        }
+
+        /* Các màu sắc cho từng loại thông báo */
+        .toast-notification.success {
+            background-color: #28a745; /* Xanh lá cây */
+        }
+        .toast-notification.error {
+            background-color: #dc3545; /* Đỏ */
+        }
+        .toast-notification.warning {
+            background-color: #ffc107; /* Vàng */
+            color: #333; /* Đổi màu chữ cho dễ nhìn */
+        }
+        .toast-notification.info {
+            background-color: #17a2b8; /* Xanh da trời */
+        }
+
+        .toast-close-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-left: 10px;
+            line-height: 1; /* Đảm bảo căn chỉnh tốt */
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid my-4">
+
+<!--    FORM TIM KIEM-->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-filter mr-2"></i>Lọc/Tìm kiếm
+        </div>
+        <div class="card-body">
+            <form class="form-row align-items-end" th:action="@{/timkiem}" method="get">
+                <div class="col-md-4 mb-3">
+                    <label>Tên thể loại</label>
+                    <input type="text" class="form-control" name="tenLoaiDuAn" th:value="${tenLoaiDuAn}"
+                           placeholder="Nhập tên thể loại">
+                </div>
+                <div class="col-md-auto mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search mr-1"></i> Tìm kiếm
+                    </button>
+                    <a th:href="@{/the_loai}" class="btn btn-secondary ml-2">
+                        <i class="fas fa-sync-alt mr-1"></i> Đặt lại
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<!--    BANG DANH SACH THE LOAI-->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-list mr-2"></i>Danh sách thể loại
+            </div>
+            <div class="text-muted small">
+                Ngày tạo: 01/01/2025 | Ngày update: 01/01/2025
+            </div>
+        </div>
+<!--// THONG BAO -->
+        <div id="toastContainer" class="toast-container">
+        </div>
+
+<!--         CAC ACTION-->
+        <div class="card-body">
+            <div class="text-right mb-3">
+                <a href="/excel" class="btn btn-success mr-2">
+                    <i class="fa fa-file-excel"></i> Xuất Excel
+                </a>
+
+                <form id="importForm" action="/import" method="post" enctype="multipart/form-data"
+                      style="display: inline-block;">
+                    <input type="file" name="file" id="fileInput" style="display: none;"
+                           onchange="document.getElementById('importForm').submit();"/>
+                    <button type="button" class="btn btn-warning mr-2"
+                            onclick="document.getElementById('fileInput').click();">
+                        <i class="fa fa-upload"></i> Import Template
+                    </button>
+                </form>
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#themTheLoaiModal">
+                    <i class="fa fa-plus"></i> Thêm thể loại
+                </button>
+            </div>
+
+<!--             BANG DU LIEU-->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Tên loại dự án</th>
+                        <th scope="col">Mô tả</th>
+                        <th scope="col">Thao tác</th> </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="theLoai, iterStat:${theLoai}">
+                        <td th:text="${iterStat.count}"></td>
+                        <td th:text="${theLoai.tenLoaiDuAn}"></td>
+                        <td th:text="${theLoai.moTa}"></td>
+                        <td>
+                            <a th:href="@{/edit/{id}(id=${theLoai.id})}" class="btn btn-sm btn-info mr-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a th:href="@{/delete/{id}(id=${theLoai.id})}" class="btn btn-sm btn-danger"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa thể loại này không?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(theLoai)}">
+                        <td colspan="5" class="text-center text-muted">Không có thể loại nào.</td>
+                    </tr>
+                    </tbody>
+
+                </table>
+            </div>
+
+<!--             PHAN TRANG-->
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${(currentPage ?: 0) == 0 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/the_loai(page=${(currentPage ?: 0) - 1}, size=${pageSize ?: 5})}">Previous</a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, (totalPages ?: 1) - 1)}"
+                            th:classappend="${i == (currentPage ?: 0) ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/the_loai(page=${i}, size=${pageSize ?: 5})}"
+                               th:text="${i + 1}"></a>
+                        </li>
+
+                        <li class="page-item"
+                            th:classappend="${(currentPage ?: 0) == (totalPages ?: 1) - 1 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/the_loai(page=${(currentPage ?: 0) + 1}, size=${pageSize ?: 5})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+<!--            MODEL THEM-->
+            <div class="modal fade" id="themTheLoaiModal" tabindex="-1" role="dialog" aria-labelledby="themTheLoaiLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="themTheLoaiLabel">THÊM THỂ LOẠI MỚI</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Đóng">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form th:action="@{/add}" th:object="${theLoaiDto}" method="post">
+                                <div class="form-group">
+                                    <label for="modalTenTheLoai">Tên Thể loại:</label>
+                                    <input type="text" class="form-control" id="modalTenTheLoai" placeholder="Nhập tên" th:field="*{tenLoaiDuAn}"
+                                           th:classappend="${#fields.hasErrors('tenLoaiDuAn')} ? 'is-invalid' : ''">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('tenLoaiDuAn')}" th:errors="*{tenLoaiDuAn}"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modalMoTa">Mô tả:</label>
+                                    <textarea class="form-control" id="modalMoTa" placeholder="Mô tả" th:field="*{moTa}"
+                                              th:classappend="${#fields.hasErrors('moTa')} ? 'is-invalid' : ''"></textarea>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('moTa')}" th:errors="*{moTa}"></div>
+                                </div>
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">+ Thêm</button>
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">✘ Quay lại</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        xintegrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        xintegrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Kiểm tra xem có lỗi validation trên theLoaiDto hay không
+    var hasErrors = /*[[${#fields.hasErrors('theLoaiDto.*')}]]*/ false;
+    // Lấy cờ showAddModal từ Controller
+    var showAddModal = /*[[${showAddModal}]]*/ false;
+
+    if (hasErrors || showAddModal) {
+        $(document).ready(function() {
+            $('#themTheLoaiModal').modal('show'); // Mở modal
+        });
+    }
+    /*]]>*/
+</script>
+
+<script th:inline="javascript">
+    $(document).ready(function() {
+        var message = /*[[${message}]]*/ null; // Lấy giá trị flash attribute 'message'
+        var messageType = /*[[${messageType}]]*/ null; // Lấy giá trị flash attribute 'messageType'
+
+        if (message) {
+            // Hàm để tạo và hiển thị toast
+            function showToast(msg, type) {
+                var toastContainer = $('#toastContainer');
+                var toast = $('<div class="toast-notification"></div>');
+
+                toast.addClass(type); // Thêm class màu sắc (success, error, warning)
+                toast.html('<span>' + msg + '</span>' +
+                    '<button type="button" class="toast-close-btn">&times;</button>');
+
+                toastContainer.append(toast);
+
+                // Buộc trình duyệt reflow để đảm bảo transition hoạt động
+                // Đây là bước quan trọng để hiệu ứng bắt đầu từ trạng thái ẩn
+                void toast[0].offsetWidth;
+
+                toast.addClass('show'); // Thêm class 'show' để hiển thị toast với hiệu ứng
+
+                // Tự động ẩn sau 5 giây (5000ms)
+                setTimeout(function() {
+                    toast.removeClass('show'); // Xóa class 'show' để bắt đầu hiệu ứng ẩn
+                    // Xóa toast khỏi DOM sau khi hiệu ứng ẩn hoàn tất
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300); // Thời gian này phải khớp với transition duration của opacity và transform trong CSS
+                }, 5000); // 5 giây
+
+                // Xử lý khi nhấn nút đóng
+                toast.find('.toast-close-btn').on('click', function() {
+                    toast.removeClass('show');
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300);
+                });
+            }
+
+            // Gọi hàm hiển thị toast với thông báo từ controller
+            showToast(message, messageType);
+        }
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

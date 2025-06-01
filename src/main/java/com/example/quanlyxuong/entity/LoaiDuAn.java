@@ -1,14 +1,19 @@
 package com.example.quanlyxuong.entity;
 
+import com.example.quanlyxuong.dto.TheLoaiDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 @Getter
 @Setter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "loai_du_an", schema = "dbo")
 public class LoaiDuAn {
     @Id
@@ -25,5 +30,4 @@ public class LoaiDuAn {
     @Nationalized
     @Column(name = "mo_ta")
     private String moTa;
-
 }
