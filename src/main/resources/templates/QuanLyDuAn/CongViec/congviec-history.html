@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch sử Import Công việc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="fas fa-history me-2"></i>Lịch sử Import Công việc</h5>
+            <a th:href="@{/congviec}" class="btn btn-secondary btn-sm">Quay lại Danh sách Công việc</a>
+        </div>
+        <div class="card-body">
+            <div th:if="${message}" class="alert alert-info" role="alert">
+                <p th:text="${message}"></p>
+            </div>
+            <p>Đây là trang hiển thị lịch sử import công việc. Chức năng này đang được phát triển.</p>
+            <!-- Thêm bảng hoặc danh sách hiển thị lịch sử tại đây -->
+            <table class="table table-bordered mt-4">
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Hành động</th>
+                        <th>Trạng thái</th>
+                        <th>Chi tiết</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2023-01-01 10:30:00</td>
+                        <td>Import Excel</td>
+                        <td>Thành công</td>
+                        <td>Import 100 dòng, 0 lỗi</td>
+                    </tr>
+                    <tr>
+                        <td>2023-01-05 14:00:00</td>
+                        <td>Import Excel</td>
+                        <td>Thất bại</td>
+                        <td>Import 50 dòng, 5 lỗi (<a href="#">tải về lỗi</a>)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 
