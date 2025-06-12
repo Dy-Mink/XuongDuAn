@@ -19,8 +19,8 @@ public class DanhSachCongViec {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_du_an")
-    private DuAn idDuAn;
+    @JoinColumn(name = "id_giai_doan")
+    private GiaiDoan idGiaiDoan;
 
     @Size(max = 255)
     @Nationalized

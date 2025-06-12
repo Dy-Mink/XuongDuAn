@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách công việc</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px; /* Vị trí từ trên xuống */
+            right: 20px; /* Vị trí từ phải sang */
+            z-index: 1050; /* Đảm bảo nó nổi lên trên các phần tử khác */
+            display: flex; /* Dùng flexbox để xếp chồng các toast */
+            flex-direction: column; /* Xếp chồng theo chiều dọc */
+            align-items: flex-end; /* Căn chỉnh các toast sang phải */
+        }
+
+        .toast-notification {
+            background-color: #333; /* Nền tối mặc định */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0; /* Ẩn ban đầu */
+            transform: translateY(-20px); /* Bắt đầu từ hơi cao hơn */
+            transition: opacity 0.3s ease-out, transform 0.3s ease-out; /* Hiệu ứng mờ dần và trượt */
+            margin-bottom: 10px; /* Khoảng cách giữa các toast nếu có nhiều */
+            min-width: 250px;
+            max-width: 350px;
+            visibility: hidden; /* Ẩn hoàn toàn khi không hiển thị */
+        }
+
+        .toast-notification.show {
+            opacity: 1; /* Hiển thị */
+            transform: translateY(0); /* Trượt về vị trí ban đầu */
+            visibility: visible; /* Hiển thị hoàn toàn */
+        }
+
+        /* Các màu sắc cho từng loại thông báo */
+        .toast-notification.success {
+            background-color: #28a745; /* Xanh lá cây */
+        }
+        .toast-notification.error {
+            background-color: #dc3545; /* Đỏ */
+        }
+        .toast-notification.warning {
+            background-color: #ffc107; /* Vàng */
+            color: #333; /* Đổi màu chữ cho dễ nhìn */
+        }
+        .toast-notification.info {
+            background-color: #17a2b8; /* Xanh da trời */
+        }
+
+        .toast-close-btn {
+            float: right;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-left: 10px;
+            line-height: 1; /* Đảm bảo căn chỉnh tốt */
+        }
+    </style>
+</head>
+<body>
+<!--Bộ lọc-->
+<div class="container-fluid mt-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h5 class="card-title text-primary"><i class="fas fa-filter me-2"></i>Bộ lọc</h5>
+            <form th:action="@{/congviec}" method="get">
+                <div class="row align-items-end">
+                    <div class="col-md-4 mb-3">
+                        <input type="text" class="form-control" id="taskName" name="taskName" th:value="${currentTaskName}" placeholder="Nhập tên task">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="priority" name="priority">
+                            <option value="">Độ ưu tiên</option>
+                            <option value="1">Cao</option>
+                            <option value="2">Trung bình</option>
+                            <option value="3">Thấp</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <select class="form-select" id="taskStatus" name="taskStatus">
+                            <option value="" th:selected="${currentTaskStatus == null or currentTaskStatus.isEmpty()}">Trạng thái công việc</option>
+                            <option value="1" th:selected="${currentTaskStatus == '1'}">Chưa hoàn thành</option>
+                            <option value="2" th:selected="${currentTaskStatus == '2'}">Đã hoàn thành</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 mb-3 text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--Bảng-->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="fas fa-list-check me-2"></i>Danh sách công việc theo dự án</h5>
+
+<!--            Thông báo-->
+            <div id="toastContainer" class="toast-container">
+            </div>
+
+            <div>
+                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#addCongViecModal">Thêm</button>
+                <button class="btn btn-outline-secondary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#importCongViecModal">IMPORT TASK</button>
+                <a th:href="@{/congviec/download-template}" class="btn btn-outline-secondary btn-sm me-2">DOWLOAD TEMPLATE</a>
+                <a th:href="@{/congviec/history}" class="btn btn-outline-secondary btn-sm me-2">LỊCH SỬ</a>
+                <a th:href="@{/congviec/download-import-errors}" class="btn btn-outline-danger btn-sm">DOWLOAD IMPORT LỖI</a>
+            </div>
+        </div>
+
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th scope="col">STT</th>
+                        <th scope="col">Tên</th>
+                        <th scope="col">Trạng Thái</th>
+                        <th scope="col">Spint</th>
+                        <th scope="col">Người được giao task</th>
+                        <th scope="col">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cv, stt:${congViec}">
+                        <td th:text="${stt.count}"></td>
+                        <td>
+                            <span class="task-name" th:text="${cv.tenCongViec}" th:data-task-id="${cv.id}" style="cursor: pointer;"></span>
+                            <div class="edit-task-actions" style="display: none;">
+                                <input type="text" class="form-control edit-task-input d-inline-block w-auto me-2">
+                                <button class="btn btn-success btn-sm save-edit-btn me-2"><i class="fas fa-save"></i></button>
+                                <button class="btn btn-secondary btn-sm cancel-edit-btn"><i class="fas fa-times"></i></button>
+                            </div>
+                        </td>
+                        <td th:text="${cv.trangThai ? 'Chưa hoàn thành' : 'Đã hoàn thành'}"></td>
+                        <td style="width: 15%;">
+                            <select class="form-select form-select-sm sprint-select mt-1" style="width: auto;">
+                                <option value="">Chọn giai đoạn</option>
+                                <option th:each="gv : ${giaiDoan}"
+                                        th:value="${gv.tenGiaiDoan}"
+                                        th:text="${gv.tenGiaiDoan}"
+                                        th:selected="${cv.idDanhSachCongViec != null and cv.idDanhSachCongViec.idGiaiDoan != null and cv.idDanhSachCongViec.idGiaiDoan.tenGiaiDoan eq gv.id}">
+                                </option>
+                            </select>
+                        </td>
+                        <td style="width: 15%;">
+                            <select class="form-select form-select-sm sprint-select mt-1" style="width: auto;">
+                                <option value="">Chọn thành viên</option>
+                                <option th:each="nd : ${nguoiDung}"
+                                        th:value="${nd.emailPt}"
+                                        th:text="${nd.emailPt}"
+                                        th:selected="${cv.idPhanCong != null and cv.idPhanCong.idNguoiDung != null and cv.idPhanCong.idNguoiDung.emailPt eq nd.id}">
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <a th:href="@{/congviec/delete/{id}(id=${cv.id})}"
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa công việc này không?');">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--                Phan trang-->
+            <div class="pagination-container">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        <li class="page-item" th:classappend="${(currentPage ?: 0) == 0 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/congviec(page=${(currentPage ?: 0) - 1}, size=${pageSize ?: 5})}">Previous</a>
+                        </li>
+
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, (totalPages ?: 1) - 1)}"
+                            th:classappend="${i == (currentPage ?: 0) ? 'active' : ''}">
+                            <a class="page-link" th:href="@{/congviec(page=${i}, size=${pageSize ?: 5})}"
+                               th:text="${i + 1}"></a>
+                        </li>
+
+                        <li class="page-item"
+                            th:classappend="${(currentPage ?: 0) == (totalPages ?: 1) - 1 ? 'disabled' : ''}">
+                            <a class="page-link"
+                               th:href="@{/congviec(page=${(currentPage ?: 0) + 1}, size=${pageSize ?: 5})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!--                ADD CONG VIEC-->
+            <div class="modal fade" id="addCongViecModal" tabindex="-1" role="dialog" aria-labelledby="addCongViecModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addCongViecModalLabel">Thêm công việc mới</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form th:action="@{/congviec/addCongViec}" th:object="${congViecnew}" method="post">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <input type="text" th:field="*{tenCongViec}" class="form-control" placeholder="Nhập tên công việc">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary"
+                                        onclick="return confirm('Xác nhận tạo công việc mới?');">Xác nhận</button>
+                                <button type="button" class="btn btn-secondary" id="cancelAddCongViec">Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import Cong Viec Modal -->
+            <div class="modal fade" id="importCongViecModal" tabindex="-1" role="dialog" aria-labelledby="importCongViecModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="importCongViecModalLabel">Import Công việc từ Excel</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form th:action="@{/congviec/import}" method="post" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label for="fileInput">Chọn file Excel:</label>
+                                    <input type="file" class="form-control" id="fileInput" name="file" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Import</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        xintegrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        xintegrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<!--add-->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    // Cờ này được đặt tên là 'congViecnew' trong Controller của bạn, không phải 'theLoaiDto'
+    var hasErrors = /*[[${#fields.hasErrors('congViecnew.*')}]]*/ false; // Kiểm tra lỗi validation cho congViecnew
+    var showAddModal = /*[[${showAddModal}]]*/ false; // Lấy cờ showAddModal từ Controller
+
+    if (hasErrors || showAddModal) {
+        $(document).ready(function() {
+            $('#addCongViecModal').modal('show'); // Mở modal
+        });
+    }
+    /*]]>*/
+</script>
+
+<!--Huy-->
+<script>
+    $(document).ready(function() {
+        // ... (các script hiện có của bạn) ...
+
+        // Xử lý nút Hủy trong modal thêm công việc
+        $('#cancelAddCongViec').on('click', function() {
+            // Đóng modal thủ công nếu nó đang mở (dù data-bs-dismiss đã có)
+            var addCongViecModalElement = document.getElementById('addCongViecModal');
+            var modalInstance = bootstrap.Modal.getInstance(addCongViecModalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+
+            // Điều hướng về trang /congviec
+            window.location.href = '/congviec';
+        });
+    });
+</script>
+
+<!--message-->
+<script th:inline="javascript">
+    $(document).ready(function() {
+        var message = /*[[${message}]]*/ null; // Lấy giá trị flash attribute 'message'
+        var messageType = /*[[${messageType}]]*/ null; // Lấy giá trị flash attribute 'messageType'
+
+        if (message) {
+            // Hàm để tạo và hiển thị toast
+            function showToast(msg, type) {
+                var toastContainer = $('#toastContainer');
+                var toast = $('<div class="toast-notification"></div>');
+
+                toast.addClass(type); // Thêm class màu sắc (success, error, warning)
+                toast.html('<span>' + msg + '</span>' +
+                    '<button type="button" class="toast-close-btn">&times;</button>');
+
+                toastContainer.append(toast);
+
+                // Buộc trình duyệt reflow để đảm bảo transition hoạt động
+                // Đây là bước quan trọng để hiệu ứng bắt đầu từ trạng thái ẩn
+                void toast[0].offsetWidth;
+
+                toast.addClass('show'); // Thêm class 'show' để hiển thị toast với hiệu ứng
+
+                // Tự động ẩn sau 5 giây (5000ms)
+                setTimeout(function() {
+                    toast.removeClass('show'); // Xóa class 'show' để bắt đầu hiệu ứng ẩn
+                    // Xóa toast khỏi DOM sau khi hiệu ứng ẩn hoàn tất
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300); // Thời gian này phải khớp với transition duration của opacity và transform trong CSS
+                }, 5000); // 5 giây
+
+                // Xử lý khi nhấn nút đóng
+                toast.find('.toast-close-btn').on('click', function() {
+                    toast.removeClass('show');
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300);
+                });
+            }
+
+            // Gọi hàm hiển thị toast với thông báo từ controller
+            showToast(message, messageType);
+        }
+    });
+    /*]]>*/
+</script>
+
+<!--update-->
+<script>
+    $(document).ready(function() {
+        // Xử lý khi nhấp vào tên công việc
+        $(document).on('click', '.task-name', function() {
+            var $taskNameSpan = $(this);
+            var currentTaskName = $taskNameSpan.text();
+            var $editActionsDiv = $taskNameSpan.next('.edit-task-actions');
+            var $editInput = $editActionsDiv.find('.edit-task-input');
+
+            // Ẩn tên công việc
+            $taskNameSpan.hide();
+            // Hiển thị các hành động chỉnh sửa (input và nút)
+            $editActionsDiv.show();
+            // Đặt giá trị hiện tại vào ô input
+            $editInput.val(currentTaskName);
+            // Focus vào ô input
+            $editInput.focus();
+        });
+
+        // Xử lý khi nhấp vào nút "Hủy"
+        $(document).on('click', '.cancel-edit-btn', function() {
+            var $editActionsDiv = $(this).closest('.edit-task-actions');
+            var $taskNameSpan = $editActionsDiv.prev('.task-name');
+
+            // Ẩn các hành động chỉnh sửa
+            $editActionsDiv.hide();
+            // Hiển thị lại tên công việc
+            $taskNameSpan.show();
+        });
+
+        // Xử lý khi nhấp vào nút "Lưu" (ĐÃ SỬA ĐỔI - KHÔNG DÙNG AJAX)
+        $(document).on('click', '.save-edit-btn', function() {
+            var $editActionsDiv = $(this).closest('.edit-task-actions');
+            var $taskNameSpan = $editActionsDiv.prev('.task-name');
+            // var taskId = $taskNameSpan.data('taskId'); // Không cần dùng taskId khi không gọi API
+            var newName = $editActionsDiv.find('.edit-task-input').val().trim();
+
+            if (newName === '') {
+                showToast('Tên công việc không được để trống!', 'error');
+                return; // Dừng lại nếu input rỗng
+            }
+
+            // --- Phần thay đổi: Cập nhật trực tiếp trên DOM, không gọi AJAX ---
+            $taskNameSpan.text(newName); // Cập nhật tên công việc hiển thị
+            // --- Kết thúc phần thay đổi ---
+
+            // Ẩn các hành động chỉnh sửa và hiển thị tên công việc
+            $editActionsDiv.hide();
+            $taskNameSpan.show();
+            showToast('Cập nhật công việc thành công!', 'success'); // Hiển thị thông báo thành công
+        });
+
+        // Hàm hiển thị thông báo toast (không thay đổi)
+        function showToast(msg, type) {
+            var toastContainer = $('#toastContainer');
+            var toast = $('<div class="toast-notification"></div>');
+
+            toast.addClass(type);
+            toast.html('<span>' + msg + '</span>' +
+                '<button type="button" class="toast-close-btn">&times;</button>');
+
+            toastContainer.append(toast);
+
+            // Buộc trình duyệt reflow để đảm bảo transition hoạt động
+            void toast[0].offsetWidth;
+
+            toast.addClass('show');
+
+            setTimeout(function() {
+                toast.removeClass('show');
+                setTimeout(function() {
+                    toast.remove();
+                }, 300); // Thời gian này phải khớp với transition duration trong CSS
+            }, 5000);
+
+            toast.find('.toast-close-btn').on('click', function() {
+                toast.removeClass('show');
+                setTimeout(function() {
+                    toast.remove();
+                }, 300);
+            });
+        }
+    });
+</script>
+</body>
+</html>

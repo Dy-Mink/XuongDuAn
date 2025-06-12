@@ -23,27 +23,6 @@ public class TheLoaiService implements LoaiDuAnIml {
         this.loaiDuAnRepository = loaiDuAnRepository;
     }
 
-//    // Chuyển Entity sang DTO
-//    private TheLoaiDto covertDTO(LoaiDuAn loaiDuAn) {
-//        if (loaiDuAn == null) {
-//            return null;
-//        }
-//        return new TheLoaiDto(loaiDuAn.getId(),loaiDuAn.getTenLoaiDuAn(),loaiDuAn.getMoTa());
-//    }
-//
-//    // Chuyển DTO sang Entity
-//    private LoaiDuAn covertToEntity(TheLoaiDto theLoaiDto) {
-//        if (theLoaiDto == null) {
-//            return null;
-//        }
-//        return new LoaiDuAn(theLoaiDto.getId(),theLoaiDto.getTenLoaiDuAn(),theLoaiDto.getMoTa());
-//    }
-
-
-//    public List<TheLoaiDto> getAll() {
-//        return loaiDuAnRepository.findAll().
-//                stream().map(TheLoaiMapper::toDto).collect(Collectors.toList());
-//    }
 
     public TheLoaiDto save(@Valid TheLoaiDto theLoaiDto) {
         theLoaiDto.setId(null);

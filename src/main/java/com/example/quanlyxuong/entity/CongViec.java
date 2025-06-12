@@ -1,6 +1,14 @@
 package com.example.quanlyxuong.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,15 +19,16 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "cong_viec", schema = "dbo")
+@Table(name = "cong_viec")
 public class CongViec {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cong_viec", nullable = false)
     private Integer id;
 
-    @Column(name = "id_phan_cong")
-    private Integer idPhanCong;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_phan_cong")
+    private PhanCong idPhanCong;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_danh_sach_cong_viec")
@@ -41,6 +50,9 @@ public class CongViec {
 
     @Column(name = "trang_thai")
     private Boolean trangThai;
+
+    @Column(name = "do_uu_tien")
+    private Integer doUuTien;
 
     @Column(name = "ngay_update")
     private LocalDate ngayUpdate;
